@@ -2,32 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+.initechNode {
+  border: solid 3px rgb(167, 165, 47);
+  border-radius: 3px;
+  padding: 5px;
+  /* width: 100%; */
+  min-width: 150px;
+  max-width: 300px;
+  display: inline-block;
+  margin: 0 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+#initechOrgChart .orgNodeChildGroup .nodeGroupLineVerticalMiddle {
+  border-right: solid 3px rgb(255, 251, 0);
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+#initechOrgChart .nodeLineBorderTop {
+  border-top: solid 3px rgb(255, 251, 0);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.reactOrgChart .nodeLineBorderTop {
+  border-top: solid 2px #46e676 !important;
+}
+
+.reactOrgChart .orgNodeChildGroup .nodeGroupLineVerticalMiddle {
+  border-right: 2px solid #46e676 !important;
 }
