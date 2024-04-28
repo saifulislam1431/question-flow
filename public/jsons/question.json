@@ -1,30 +1,30 @@
 [
     {
         "_id": "66266fbb66d7129162f79bfe",
-        "Question": "Greetings!",
-        "children": [
+        "Question": "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
+        "Options": [
             {
                 "Name": "Booking",
                 "Type": "Button",
                 "Action": "",
                 "NextStepId": "6628b3f9517701e1dee3c3fc",
-                "children": {
+                "child": {
                     "_id": "6628b3f9517701e1dee3c3fc",
                     "FlowId": "662640ef73cacc52bc86a733",
                     "ParentId": "66266fbb66d7129162f79bfe",
                     "Question": "Choose Option",
-                    "children": [
+                    "Options": [
                         {
                             "Name": "A",
                             "Type": "Button",
                             "Action": "",
                             "NextStepId": "6628b456517701e1dee3c3fe",
-                            "children": {
+                            "child": {
                                 "_id": "6628b456517701e1dee3c3fe",
                                 "FlowId": "662640ef73cacc52bc86a733",
                                 "ParentId": "6628b3f9517701e1dee3c3fc",
                                 "Question": "Why you've choose this option?",
-                                "children": [
+                                "Options": [
                                     {
                                         "Name": "A",
                                         "Type": "Button",
@@ -37,7 +37,8 @@
                                         "Action": "",
                                         "NextStepId": ""
                                     }
-                                ]
+                                ],
+                                "children": []
                             }
                         },
                         {
@@ -46,7 +47,8 @@
                             "Action": "",
                             "NextStepId": ""
                         }
-                    ]
+                    ],
+                    "children": []
                 }
             },
             {
@@ -60,12 +62,12 @@
                 "Type": "Button",
                 "Action": "",
                 "NextStepId": "6628b419517701e1dee3c3fd",
-                "children": {
+                "child": {
                     "_id": "6628b419517701e1dee3c3fd",
                     "FlowId": "662640ef73cacc52bc86a733",
                     "ParentId": "66266fbb66d7129162f79bfe",
                     "Question": "Why are you cancelling?",
-                    "children": [
+                    "Options": [
                         {
                             "Name": "Hamara Morji",
                             "Type": "Button",
@@ -78,7 +80,8 @@
                             "Action": "",
                             "NextStepId": ""
                         }
-                    ]
+                    ],
+                    "children": []
                 }
             }
         ],

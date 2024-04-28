@@ -1,4 +1,5 @@
 'use client'
+import D3FlowGraph from '@/components/D3FlowGraph/D3FlowGraph';
 import DropDownChart from '@/components/DropDownChart/DropDownChart';
 import VerticalFlow from '@/components/VerticalFlow/VerticalFlow';
 import React, { useEffect, useState } from 'react';
@@ -13,6 +14,8 @@ const HomePage = () => {
       .then(data => setQuestions(data))
   }, [])
 
+
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center w-full">
       {/* <div>
@@ -20,7 +23,8 @@ const HomePage = () => {
           <VerticalFlow key={index} data={flow} />
         ))}
       </div> */}
-      <DropDownChart />
+      {/* <DropDownChart /> */}
+      <D3FlowGraph />
     </main>
   );
 };
