@@ -1,42 +1,99 @@
 'use client'
-import React, { useRef } from 'react';
+import { useCenteredTree } from '@/utils/helper';
+import React, { useEffect, useRef, useState } from 'react';
 import Tree from 'react-d3-tree';
 import { useDraggable } from 'react-use-draggable-scroll';
 
 const D3FlowGraph = () => {
-    const containerRef = useRef(null);
-    const { events } = useDraggable(containerRef, {
-        applyRubberBandEffect: true,
-    });
+    const [optionValue, setOptionValue] = useState("")
+    const containerStyles = {
+        width: "100vw",
+        height: "100vh",
+        overflow: "scroll"  // Ensure this is set to allow scrolling
+    };
+    const [dimensions, translate, containerRef] = useCenteredTree();
+    const [dragEvents, setDragEvents] = useState({});
+
+    const [showTree, setShowTree] = useState(false);
+
+    useEffect(() => { setShowTree(true) }, [])
+
+    useEffect(() => {
+        if (containerRef.current) {
+            const { events } = useDraggable(containerRef, {
+                applyRubberBandEffect: true,
+            });
+            setDragEvents(events);
+        }
+    }, [containerRef.current]);
+
+    if (!showTree) {
+        return <></>
+    }
+
     const orgChart = {
         name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
         children: [
             {
-                name: 'Manager',
+                name: 'Booking',
                 attributes: {
                     department: 'Production',
                 },
                 children: [
                     {
-                        name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
+                        name: "A",
                         attributes: {
                             department: 'Fabrication',
                         },
                         children: [
                             {
-                                name: 'Worker',
+                                name: "Why you've choose this option?",
+                                children: [
+                                    {
+                                        name: "A",
+                                    },
+                                    {
+                                        name: "B",
+                                    }
+                                ]
                             },
                         ],
                     },
                     {
-                        name: 'Foreman',
+                        name: 'B',
+                        attributes: {
+                            department: 'Assembly',
+                        },
+                        children: [],
+                    }
+                ],
+            },
+            {
+                name: 'Return',
+                attributes: {
+                    department: 'Production',
+                },
+                children: [],
+            },
+            {
+                name: 'Cancel',
+                attributes: {
+                    department: 'Production',
+                },
+                children: [
+                    {
+                        name: "Hamara Morji",
+                        attributes: {
+                            department: 'Fabrication',
+                        },
+                        children: [],
+                    },
+                    {
+                        name: "I don't know",
                         attributes: {
                             department: 'Assembly',
                         },
                         children: [
-                            {
-                                name: 'Worker',
-                            },
                         ],
                     },
                 ],
@@ -45,7 +102,7 @@ const D3FlowGraph = () => {
     };
 
     const handleNodeClick = (nodeName) => {
-        alert(nodeName);
+        setOptionValue(nodeName)
     };
 
     // const renderCustomNodeElement = ({ nodeDatum, toggleNode }) => {
@@ -174,15 +231,41 @@ const D3FlowGraph = () => {
 
 
     return (
-        <div id="treeWrapper" style={{
-            width: "100%",
-            height: "600px",
-            border: "1px solid #000"
-        }} className="overflow-scroll"
+        // <div id="treeWrapper"
+        //     {...events}  // Spread the draggable events here
+        //     className="overflow-scroll"
+        //     // style={containerStyles}
+        //     ref={containerRef}
+        //     dimensions={dimensions}
+        //     // translate={translate}
+        //     style={{ ...containerStyles, transform: `translate(${translate.x}px, ${translate.y}px)` }}
+        // >
+        //     <Tree
+        //         data={orgChart}
+        //         zoomable={true}
+        //         translate={translate}
+        //         orientation='vertical'
+        //         renderCustomNodeElement={renderCustomNodeElement}
+        //     />
+        // </div>
+
+        <div id="treeWrapper"
+            {...dragEvents}  // Apply draggable events
+            className="overflow-scroll"
+            // style={{ ...containerStyles, transform: `translate(${translate.x}px, ${translate.y}px)` }}
+            style={containerStyles}
+            translate={translate}
             ref={containerRef}
-            {...events}
         >
-            <Tree data={orgChart} zoomable={true} Draggable={true} collapsible={true} orientation='vertical' renderCustomNodeElement={renderCustomNodeElement} />
+            <Tree
+                data={orgChart}
+                zoomable={true}
+                translate={translate}
+                orientation='vertical'
+                renderCustomNodeElement={renderCustomNodeElement}
+                nodeSize={{ x: 150, y: 200 }}
+                separation={{ siblings: 2, nonSiblings: 2 }}
+            />
         </div>
     );
 };
