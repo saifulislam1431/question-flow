@@ -5,7 +5,8 @@ import Tree from 'react-d3-tree';
 import { useDraggable } from 'react-use-draggable-scroll';
 
 const D3FlowGraph = () => {
-    const [optionValue, setOptionValue] = useState("")
+    const [optionValue, setOptionValue] = useState("");
+    console.log(optionValue);
     const containerStyles = {
         width: "100vw",
         height: "100vh",
@@ -13,7 +14,44 @@ const D3FlowGraph = () => {
     };
     const [dimensions, translate, containerRef] = useCenteredTree();
     const [dragEvents, setDragEvents] = useState({});
-
+    const [treeData, setTreeData] = useState([
+        {
+            name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
+            children: [
+                {
+                    name: 'Booking',
+                    attributes: { department: 'Production' },
+                    children: [
+                        {
+                            name: "A",
+                            attributes: { department: 'Fabrication' },
+                            children: [
+                                { name: "Why you've choose this option?", children: [{ name: "A" }, { name: "B" }] }
+                            ],
+                        },
+                        {
+                            name: 'B',
+                            attributes: { department: 'Assembly' },
+                            children: [],
+                        }
+                    ],
+                },
+                {
+                    name: 'Return',
+                    attributes: { department: 'Production' },
+                    children: [],
+                },
+                {
+                    name: 'Cancel',
+                    attributes: { department: 'Production' },
+                    children: [
+                        { name: "Hamara Morji", attributes: { department: 'Fabrication' } },
+                        { name: "I don't know", attributes: { department: 'Assembly' }, children: [] },
+                    ],
+                },
+            ],
+        }
+    ]);
     const [showTree, setShowTree] = useState(false);
 
     useEffect(() => { setShowTree(true) }, [])
@@ -27,130 +65,110 @@ const D3FlowGraph = () => {
         }
     }, [containerRef.current]);
 
+    useEffect(() => {
+        setTreeData(currentData => currentData.map(node => ({
+            ...node,
+            children: node.children.map(child => ({
+                ...child,
+                collapsed: true,
+                children: child.children?.map(subChild => ({
+                    ...subChild,
+                    collapsed: true
+                }))
+            }))
+        })));
+    }, []);
+
     if (!showTree) {
         return <></>
     }
 
-    const orgChart = {
-        name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
-        children: [
-            {
-                name: 'Booking',
-                attributes: {
-                    department: 'Production',
-                },
-                children: [
-                    {
-                        name: "A",
-                        attributes: {
-                            department: 'Fabrication',
-                        },
-                        children: [
-                            {
-                                name: "Why you've choose this option?",
-                                children: [
-                                    {
-                                        name: "A",
-                                    },
-                                    {
-                                        name: "B",
-                                    }
-                                ]
-                            },
-                        ],
-                    },
-                    {
-                        name: 'B',
-                        attributes: {
-                            department: 'Assembly',
-                        },
-                        children: [],
-                    }
-                ],
-            },
-            {
-                name: 'Return',
-                attributes: {
-                    department: 'Production',
-                },
-                children: [],
-            },
-            {
-                name: 'Cancel',
-                attributes: {
-                    department: 'Production',
-                },
-                children: [
-                    {
-                        name: "Hamara Morji",
-                        attributes: {
-                            department: 'Fabrication',
-                        },
-                        children: [],
-                    },
-                    {
-                        name: "I don't know",
-                        attributes: {
-                            department: 'Assembly',
-                        },
-                        children: [
-                        ],
-                    },
-                ],
-            },
-        ],
-    };
-
-    const handleNodeClick = (nodeName) => {
-        setOptionValue(nodeName)
-    };
-
-    // const renderCustomNodeElement = ({ nodeDatum, toggleNode }) => {
-    //     const padding = 10; // Padding inside the rectangle
-    //     const charWidth = 10; // Approximate width per character
-    //     const textLength = nodeDatum.name.length;
-    //     const rectWidth = textLength * charWidth + 2 * padding; // Calculate width based on text length
-
-    //     return (
-    //         <g onClick={(e) => {
-    //             e.stopPropagation(); // Prevents event bubbling
-    //             handleNodeClick(nodeDatum.name);
-    //             toggleNode();
-    //         }}>
-    //             <defs>
-    //                 <filter id="f1" x="0" y="0" width="200%" height="200%">
-    //                     <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
-    //                     <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
-    //                     <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-    //                 </filter>
-    //             </defs>
-    //             <rect
-    //                 width={rectWidth}
-    //                 height="50"
-    //                 x={-rectWidth / 2}
-    //                 y="-25"
-    //                 fill="#26C279"
-    //                 stroke="#155F3D"
-    //                 strokeWidth="1px"
-    //                 rx="10" // Set border radius here
-    //                 ry="10"
-    //                 filter="url(#f1)" // Apply shadow effect
-    //             />
-    //             <text
-    //                 fill="#ffffff"
-    //                 stroke="#ffffff"
-    //                 strokeWidth=".5"
-    //                 x="0"
-    //                 y="0"
-    //                 textAnchor="middle"
-    //                 alignmentBaseline="middle"
-    //                 style={{ pointerEvents: "none" }} // Prevent text from capturing click events
-    //             >
-    //                 {nodeDatum.name}
-    //             </text>
-    //         </g>
-    //     );
+    // const orgChart = {
+    //     name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
+    //     children: [
+    //         {
+    //             name: 'Booking',
+    //             attributes: {
+    //                 department: 'Production',
+    //             },
+    //             children: [
+    //                 {
+    //                     name: "A",
+    //                     attributes: {
+    //                         department: 'Fabrication',
+    //                     },
+    //                     children: [
+    //                         {
+    //                             name: "Why you've choose this option?",
+    //                             children: [
+    //                                 {
+    //                                     name: "A",
+    //                                 },
+    //                                 {
+    //                                     name: "B",
+    //                                 }
+    //                             ]
+    //                         },
+    //                     ],
+    //                 },
+    //                 {
+    //                     name: 'B',
+    //                     attributes: {
+    //                         department: 'Assembly',
+    //                     },
+    //                     children: [],
+    //                 }
+    //             ],
+    //         },
+    //         {
+    //             name: 'Return',
+    //             attributes: {
+    //                 department: 'Production',
+    //             },
+    //             children: [],
+    //         },
+    //         {
+    //             name: 'Cancel',
+    //             attributes: {
+    //                 department: 'Production',
+    //             },
+    //             children: [
+    //                 {
+    //                     name: "Hamara Morji",
+    //                     attributes: {
+    //                         department: 'Fabrication',
+    //                     },
+    //                     children: [],
+    //                 },
+    //                 {
+    //                     name: "I don't know",
+    //                     attributes: {
+    //                         department: 'Assembly',
+    //                     },
+    //                     children: [
+    //                     ],
+    //                 },
+    //             ],
+    //         },
+    //     ],
     // };
+
+    const toggleChildrenVisibility = (nodes, nodeName) => nodes.map(node => ({
+        ...node,
+        children: node.children ? toggleChildrenVisibility(node.children, nodeName) : undefined,
+        collapsed: node.name === nodeName ? !node.collapsed : node.collapsed,
+    }));
+
+    const handleNodeClick = (nodeData) => {
+        // Set the option value to the node's name
+        setOptionValue(nodeData);
+        // Toggle collapse state
+        if (nodeData.children) {
+            const newTreeData = toggleChildrenVisibility(treeData, nodeData);
+            setTreeData(newTreeData);
+        }
+    };
+
 
 
     const renderCustomNodeElement = ({ nodeDatum, toggleNode }) => {
@@ -231,43 +249,28 @@ const D3FlowGraph = () => {
 
 
     return (
-        // <div id="treeWrapper"
-        //     {...events}  // Spread the draggable events here
-        //     className="overflow-scroll"
-        //     // style={containerStyles}
-        //     ref={containerRef}
-        //     dimensions={dimensions}
-        //     // translate={translate}
-        //     style={{ ...containerStyles, transform: `translate(${translate.x}px, ${translate.y}px)` }}
-        // >
-        //     <Tree
-        //         data={orgChart}
-        //         zoomable={true}
-        //         translate={translate}
-        //         orientation='vertical'
-        //         renderCustomNodeElement={renderCustomNodeElement}
-        //     />
-        // </div>
 
         <div id="treeWrapper"
             {...dragEvents}  // Apply draggable events
             className="overflow-scroll"
-            // style={{ ...containerStyles, transform: `translate(${translate.x}px, ${translate.y}px)` }}
             style={containerStyles}
             translate={translate}
             ref={containerRef}
         >
             <Tree
-                data={orgChart}
+                data={treeData}
                 zoomable={true}
                 translate={translate}
                 orientation='vertical'
                 renderCustomNodeElement={renderCustomNodeElement}
                 nodeSize={{ x: 150, y: 200 }}
                 separation={{ siblings: 2, nonSiblings: 2 }}
+                pathFunc="diagonal"
+                initialDepth={0}
             />
         </div>
     );
 };
 
 export default D3FlowGraph;
+
