@@ -6,7 +6,7 @@ import { useDraggable } from 'react-use-draggable-scroll';
 
 const D3FlowGraph = () => {
     const [optionValue, setOptionValue] = useState("");
-    console.log(optionValue);
+    // console.log(optionValue);
     const containerStyles = {
         width: "100vw",
         height: "100vh",
@@ -16,7 +16,7 @@ const D3FlowGraph = () => {
     const [dragEvents, setDragEvents] = useState({});
     const [treeData, setTreeData] = useState([
         {
-            name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
+            name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today? I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
             children: [
                 {
                     name: 'Booking',
@@ -26,11 +26,11 @@ const D3FlowGraph = () => {
                             name: "A",
                             attributes: { department: 'Fabrication' },
                             children: [
-                                { name: "Why you've choose this option?", children: [{ name: "A" }, { name: "B" }] }
+                                { name: "Why you've choose this option? Why you've choose this option?", children: [{ name: "A" }, { name: "B" }] }
                             ],
                         },
                         {
-                            name: 'B',
+                            name: "B",
                             attributes: { department: 'Assembly' },
                             children: [],
                         }
@@ -159,7 +159,8 @@ const D3FlowGraph = () => {
         collapsed: node.name === nodeName ? !node.collapsed : node.collapsed,
     }));
 
-    const handleNodeClick = (nodeData) => {
+    const handleNodeClick = (nodeData, node) => {
+        // console.log(node);
         // Set the option value to the node's name
         setOptionValue(nodeData);
         // Toggle collapse state
@@ -172,11 +173,13 @@ const D3FlowGraph = () => {
 
 
     const renderCustomNodeElement = ({ nodeDatum, toggleNode }) => {
-        const maxCharsPerLine = 28; // Adjust this if needed
+        const maxCharsPerLine = 38; // Adjust this if needed
         const lineHeight = 20; // Line height in pixels
         const verticalPadding = 10; // Vertical padding inside the rectangle
-        const horizontalPadding = 10; // Horizontal padding inside the rectangle
-        const rectWidth = 220; // Fixed width of the rectangle
+        const horizontalPadding = 20; // Horizontal padding inside the rectangle
+        const rectWidth = 300;
+        const singleWidth = 160 // Fixed width of the rectangle
+        // Fixed width of the rectangle
 
         // Function to split text into lines without breaking words
         const splitText = (text, maxChars) => {
@@ -196,52 +199,131 @@ const D3FlowGraph = () => {
             return lines;
         };
 
+        const handleEdit = (node) => {
+            console.log("Edit data of", node);
+        }
+
+        const handleAdd = (node) => {
+            console.log("Add data of", node);
+        }
+
         const lines = splitText(nodeDatum.name, maxCharsPerLine); // Split text into lines
-        const rectHeight = lines.length * lineHeight + 2 * verticalPadding; // Calculate height based on number of lines
+        const rectHeight = lines.length * lineHeight + 6 * verticalPadding; // Calculate height based on number of lines
 
         return (
             <g onClick={(e) => {
                 e.stopPropagation(); // Prevents event bubbling
-                handleNodeClick(nodeDatum.name);
+                handleNodeClick(nodeDatum.name, nodeDatum);
                 toggleNode();
             }}>
                 <defs>
-                    <filter id="f1" x="0" y="0" width="200%" height="200%">
-                        <feOffset result="offOut" in="SourceAlpha" dx="5" dy="5" />
-                        <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
-                        <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-                    </filter>
+                    {nodeDatum?.children?.length > 0 ? (
+                        <filter id="f1" x="-50%" y="-50%" width="200%" height="200%">
+                            <feOffset result="offOut" in="SourceAlpha" dx="0" dy="2" />
+                            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="5" />
+                            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+                        </filter>
+                    ) : (
+                        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                            {/* <feOffset result="offOut" in="SourceAlpha" dx="0" dy="2" /> */}
+                            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="5" />
+                            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+                            <feDropShadow
+                                dx="0"
+                                dy="2"
+                                stdDeviation="5"
+                                floodColor="#ff685e"
+                                floodOpacity="0.8"
+                            />
+                        </filter>
+                    )}
                 </defs>
+
                 <rect
-                    width={rectWidth}
+                    width={lines?.length === 1 && nodeDatum.name.length < 15 ? singleWidth : rectWidth}
                     height={rectHeight}
-                    x={-rectWidth / 2}
-                    y={-rectHeight / 2}
-                    fill="#26C279"
-                    stroke="#155F3D"
-                    strokeWidth="1px"
-                    rx="10"
-                    ry="10"
-                    filter="url(#f1)"
+                    x={lines?.length === 1 && nodeDatum.name.length < 15 ? -singleWidth / 2 : -rectWidth / 2}
+                    y={-rectHeight / 3}
+                    rx="30"
+                    ry="30"
+                    filter={nodeDatum?.children?.length > 0 ? "url(#f1)" : "url(#shadow)"}
                 />
                 {lines.map((line, index) => (
-                    <text
-                        key={index}
-                        fill="#ffffff"
-                        stroke="none"
-                        strokeWidth="0"
-                        x={lines.length === 1 ? 0 : -rectWidth / 2 + horizontalPadding} // Center if only one line
-                        y={lines.length === 1
-                            ? 0 // Vertically center if only one line
-                            : -rectHeight / 2 + verticalPadding + lineHeight * (index + 0.5)}
-                        textAnchor={lines.length === 1 ? "middle" : "start"}
-                        alignmentBaseline="middle"
-                        style={{ pointerEvents: "none" }}
-                    >
-                        {line}
-                    </text>
+                    <g key={index}>
+                        <text
+                            fill="#ffffff"
+                            stroke="none"
+                            strokeWidth="0"
+                            x={lines.length === 1 ? 0 : -rectWidth / 17 + horizontalPadding} // Center if only one line
+                            y={lines.length === 1
+                                ? 0 // Vertically center if only one line
+                                : -rectHeight / 3 + verticalPadding + lineHeight * (index + 0.5)}
+                            textAnchor={lines.length === 1 ? "middle" : "middle"}
+                            alignmentBaseline="middle"
+                            style={{ pointerEvents: "none" }}
+                        >
+                            {line}
+                        </text>
+                        {nodeDatum?.children?.length > 0 ? (
+                            <image
+                                xlinkHref="./assets/icon/edit.png" // Provide the path to the edit icon SVG
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevents event bubbling
+                                    handleEdit(nodeDatum)
+                                }}
+                                x={-10} // Example value: 20 units from the left
+                                y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}// Example value: 20 units from the top
+                                width={25} // Example value: 40 units width
+                                height={25} // Example value: 40 units height
+                            // Set other attributes for the edit icon as needed
+                            />
+                        ) : (
+                            <>
+                                <image
+                                    xlinkHref="./assets/icon/edit.png" // Provide the path to the edit icon SVG
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevents event bubbling
+                                        handleEdit(nodeDatum)
+                                    }}
+                                    x={8} // Example value: 20 units from the left
+                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3} // Example value: 20 units from the top
+                                    width={25} // Example value: 40 units width
+                                    height={25} // Example value: 40 units height
+                                // Set other attributes for the edit icon as needed
+                                />
+                                <image
+                                    xlinkHref="./assets/icon/plus.png" // Provide the path to the add icon SVG
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevents event bubbling
+                                        handleAdd(nodeDatum)
+                                    }}
+                                    x={-28} // Example value: 20 units from the left
+                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3} // Example value: 20 units from the top
+                                    width={25} // Example value: 40 units width
+                                    height={25} // Example value: 40 units height
+                                // Set other attributes for the add icon as needed
+                                />
+                            </>
+                        )}
+
+                        {
+                            nodeDatum?.children?.length > 0 && <image
+                                xlinkHref="./assets/icon/chevron.png" // Provide the path to the edit icon SVG
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevents event bubbling
+                                    toggleNode();
+                                }}
+                                x={-13} // Example value: 20 units from the left
+                                y={lines.length === 1 ? 60 : rectHeight / 1.4}  // Example value: 20 units from the top
+                                width={25} // Example value: 40 units width
+                                height={25} // Example value: 40 units height
+                            // Set other attributes for the edit icon as needed
+                            />
+                        }
+                    </g>
                 ))}
             </g>
+
         );
     };
 
@@ -263,10 +345,11 @@ const D3FlowGraph = () => {
                 translate={translate}
                 orientation='vertical'
                 renderCustomNodeElement={renderCustomNodeElement}
-                nodeSize={{ x: 150, y: 200 }}
+                nodeSize={{ x: 200, y: 200 }}
                 separation={{ siblings: 2, nonSiblings: 2 }}
                 pathFunc="diagonal"
                 initialDepth={0}
+                shouldCollapseNeighborNodes={true}
             />
         </div>
     );
