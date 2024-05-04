@@ -6,13 +6,63 @@ import React, { useEffect, useState } from 'react';
 
 const HomePage = () => {
 
-  const [questions, setQuestions] = useState([]);
+  // const [questions, setQuestions] = useState([]);
 
-  useEffect(() => {
-    fetch("/jsons/question.json")
-      .then(res => res.json())
-      .then(data => setQuestions(data))
-  }, [])
+  // useEffect(() => {
+  //   fetch("/jsons/question.json")
+  //     .then(res => res.json())
+  //     .then(data => setQuestions(data))
+  // }, [])
+
+  const [treeData, setTreeData] = useState([
+    {
+      name: "Good day! I'm thrilled to assist you with your train ticket booking. How may I serve you today? I'm thrilled to assist you with your train ticket booking. How may I serve you today?",
+      children: [
+        {
+          name: 'Booking',
+          attributes: { department: 'Production' },
+          children: [
+            {
+              name: "Why you've choose this option?",
+              attributes: { department: 'Fabrication' },
+              children: [
+                { name: "A" }, { name: "B" }
+              ],
+            },
+            // {
+            //     name: "B",
+            //     attributes: { department: 'Assembly' },
+            //     children: [],
+            // }
+          ],
+        },
+        {
+          name: 'Return',
+          attributes: { department: 'Production' },
+          children: [],
+        },
+        {
+          name: 'Cancel',
+          attributes: { department: 'Production' },
+          children: [
+            { name: "Hamara Morji", attributes: { department: 'Fabrication' } },
+            { name: "I don't know", attributes: { department: 'Assembly' }, children: [] },
+          ],
+        },
+      ],
+    }
+  ]);
+
+
+
+  const handleEditNodeModal = (node) => {
+
+    console.log("Edit data of", node);
+  }
+
+  const handleAddNodeModal = (node) => {
+    console.log("Add data of", node);
+  }
 
 
 
@@ -24,7 +74,7 @@ const HomePage = () => {
         ))}
       </div> */}
       {/* <DropDownChart /> */}
-      <D3FlowGraph />
+      <D3FlowGraph setTreeData={setTreeData} treeData={treeData} handleAddNodeModal={handleAddNodeModal} handleEditNodeModal={handleEditNodeModal} />
     </main>
   );
 };
