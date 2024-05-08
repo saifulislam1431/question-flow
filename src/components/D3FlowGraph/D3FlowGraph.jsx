@@ -278,7 +278,6 @@ const D3FlowGraph = ({ treeData, setTreeData, alwaysShowNeighborNode = false, ha
                             toggleDropdown(nodeDatum?.name);
                         }}>
                             {/* Menu toggler */}
-
                             {
                                 !dropdownStates[nodeDatum.name] ? <image
                                     xlinkHref="./assets/icon/dots.png" // Provide the path to the edit icon SVG
@@ -295,44 +294,60 @@ const D3FlowGraph = ({ treeData, setTreeData, alwaysShowNeighborNode = false, ha
                                 />
                             }
 
-
                             {/* Menu items */}
                             <g
                                 style={{ display: dropdownStates[nodeDatum.name] ? 'block' : 'none', zIndex: 1000 }}
                             >
-                                <g className='menu'>
-                                    <a href="#">
-                                        <text x="-40" y="40" fill="#ffffff" font-size="40px">1</text>
-                                    </a>
-                                </g>
-                                <g className='menu'>
-                                    <a href="#">
-                                        <text x="-25" y="65" fill="#ffffff" font-size="40px">2</text>
-                                    </a>
-                                </g>
-                                <g className='menu'>
-                                    <a href="#">
-                                        <text x="25" y="65" fill="#ffffff" font-size="40px">3</text>
-                                    </a>
-                                </g>
-                                <g className='menu'>
-                                    <a href="#">
-                                        <text x="40" y="40" fill="#ffffff" font-size="40px">4</text>
-                                    </a>
-                                </g>
-                                <g className='menu'>
-                                    <a href="#">
-                                        <text x="25" y="15" fill="#ffffff" font-size="40px">5</text>
-                                    </a>
-                                </g>
-                                <g className='menu'>
-                                    <a href="#">
-                                        <text x="-25" y="15" fill="#ffffff" font-size="40px">6</text>
-                                    </a>
-                                </g>
 
+                                <rect
+                                    width={140}
+                                    height={140}
+                                    filter={"url(#f1)"}
+                                    fill='#ffffff'
+                                    rx="10"
+                                    ry="10"
+                                    x="25"
+                                    y="10"
+                                />
 
+                                {
+                                    nodeDatum?.name?.includes("?") || nodeDatum?.children?.length > 0 ? <image
+                                        xlinkHref="./assets/icon/edit.png"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditNodeModal(nodeDatum);
+                                        }}
+                                        width={25}
+                                        height={25}
+                                        x="35"
+                                        y="20"
+                                    /> : nodeDatum?.children?.length <= 0 | !nodeDatum?.children && <>
+                                        <image
+                                            xlinkHref="./assets/icon/edit.png"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditNodeModal(nodeDatum)
+                                            }}
+                                            width={25}
+                                            height={25}
+                                            x="35"
+                                            y="20"
+                                        />
 
+                                        <image
+                                            xlinkHref="./assets/icon/plus.png"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddNodeModal(nodeDatum)
+                                            }}
+                                            width={25}
+                                            height={25}
+                                            x="65"
+                                            y="20"
+
+                                        />
+                                    </>
+                                }
                             </g>
                         </g>
 
