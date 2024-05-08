@@ -55,6 +55,27 @@ const HomePage = () => {
 
 
 
+  const copyNodeData = (node) => {
+    navigator.clipboard.writeText(node)
+      .then(() => {
+        console.log('Text copied to clipboard');
+      })
+      .catch(err => {
+        console.error('Unable to copy text: ', err);
+      });
+  }
+
+  const pasteNodeData = () => {
+    navigator.clipboard.readText()
+      .then((node) => {
+        console.log('Clipboard content:', node);
+        // Do whatever you need to do with the clipboard content
+      })
+      .catch(err => {
+        console.error('Unable to read clipboard content: ', err);
+      });
+  }
+
   const handleEditNodeModal = (node) => {
 
     console.log("Edit data of", node);
@@ -74,7 +95,7 @@ const HomePage = () => {
         ))}
       </div> */}
       {/* <DropDownChart /> */}
-      <D3FlowGraph setTreeData={setTreeData} treeData={treeData} handleAddNodeModal={handleAddNodeModal} handleEditNodeModal={handleEditNodeModal} />
+      <D3FlowGraph setTreeData={setTreeData} treeData={treeData} handleAddNodeModal={handleAddNodeModal} handleEditNodeModal={handleEditNodeModal} copyNodeData={copyNodeData} pasteNodeData={pasteNodeData} />
     </main>
   );
 };

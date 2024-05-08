@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import Tree from 'react-d3-tree';
 import { useDraggable } from 'react-use-draggable-scroll';
 
-const D3FlowGraph = ({ treeData, setTreeData, alwayShowNeighborNode = false, handleEditNodeModal, handleAddNodeModal }) => {
+const D3FlowGraph = ({ treeData, setTreeData, alwaysShowNeighborNode = false, handleEditNodeModal, handleAddNodeModal, copyNodeData, pasteNodeData }) => {
+    const [dropdownStates, setDropdownStates] = useState({});
     const [optionValue, setOptionValue] = useState("");
     const [currentNode, setCurrentNode] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -119,6 +120,13 @@ const D3FlowGraph = ({ treeData, setTreeData, alwayShowNeighborNode = false, han
     //     ],
     // };
 
+    const toggleDropdown = (nodeName) => {
+        setDropdownStates(prevStates => ({
+            // ...prevStates,
+            [nodeName]: !prevStates[nodeName] // Toggles the state for the clicked node
+        }));
+    };
+
     const toggleChildrenVisibility = (nodes, nodeName) => nodes.map(node => ({
         ...node,
         children: node.children ? toggleChildrenVisibility(node.children, nodeName) : undefined,
@@ -127,6 +135,7 @@ const D3FlowGraph = ({ treeData, setTreeData, alwayShowNeighborNode = false, han
 
     const handleNodeClick = (nodeData, node) => {
         console.log(node);
+        copyNodeData(node)
         // console.log(treeData);
         // Set the option value to the node's name
         setOptionValue(nodeData);
@@ -227,47 +236,108 @@ const D3FlowGraph = ({ treeData, setTreeData, alwayShowNeighborNode = false, han
                         >
                             {line}
                         </text>
-                        {nodeDatum?.name?.includes("?") || nodeDatum?.children?.length > 0 ? (
-                            <image
-                                xlinkHref="./assets/icon/edit.png" // Provide the path to the edit icon SVG
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Prevents event bubbling
-                                    handleEditNodeModal(nodeDatum);
-                                }}
-                                x={-10} // Example value: 20 units from the left
-                                y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}// Example value: 20 units from the top
-                                width={25} // Example value: 40 units width
-                                height={25} // Example value: 40 units height
-                            // Set other attributes for the edit icon as needed
+
+
+
+                        {/* <image
+                            xlinkHref="./assets/icon/dots.png" // Provide the path to the edit icon SVG
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevents event bubbling
+                                toggleDropdown(nodeDatum?.name);
+                            }}
+                            x={-10} // Example value: 20 units from the left
+                            y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
+                            width={25}
+                            height={25}
+                        />
+                        <g
+                            transform={`translate(0, ${lines.length === 1 ? 60 : rectHeight / 1.4 + 25})`} // Adjust the position based on your layout
+                            style={{ display: dropdownStates[nodeDatum.name] ? 'block' : 'none', position: 'absolute', zIndex: 1000 }} // Show/hide dropdown based on state of the clicked node
+                        >
+
+
+                            <rect
+                                x="40"
+                                y="-50"
+                                width={140}
+                                height={140}
+                                filter={"url(#f1)"}
+                                fill='#ffffff'
+                                rx="10"
+                                ry="10"
                             />
-                        ) : nodeDatum?.children?.length <= 0 | !nodeDatum?.children && (
-                            <>
-                                <image
-                                    xlinkHref="./assets/icon/edit.png" // Provide the path to the edit icon SVG
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // Prevents event bubbling
-                                        handleEditNodeModal(nodeDatum)
-                                    }}
-                                    x={8} // Example value: 20 units from the left
-                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3} // Example value: 20 units from the top
-                                    width={25} // Example value: 40 units width
-                                    height={25} // Example value: 40 units height
-                                // Set other attributes for the edit icon as needed
+
+
+                            <text x="50" y="-20" style={{ cursor: 'pointer' }}>Option 1</text>
+                            <text x="50" y="0" style={{ cursor: 'pointer' }}>Option 2</text>
+                            <text x="50" y="20" style={{ cursor: 'pointer' }}>Option 3</text>
+                        </g> */}
+
+                        <g onClick={(e) => {
+                            e.stopPropagation(); // Prevents event bubbling
+                            toggleDropdown(nodeDatum?.name);
+                        }}>
+                            {/* Menu toggler */}
+
+                            {
+                                !dropdownStates[nodeDatum.name] ? <image
+                                    xlinkHref="./assets/icon/dots.png" // Provide the path to the edit icon SVG
+                                    x={-10} // Example value: 20 units from the left
+                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
+                                    width={25}
+                                    height={25}
+                                /> : <image
+                                    xlinkHref="./assets/icon/cross.png" // Provide the path to the edit icon SVG
+                                    x={-10} // Example value: 20 units from the left
+                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
+                                    width={25}
+                                    height={25}
                                 />
-                                <image
-                                    xlinkHref="./assets/icon/plus.png" // Provide the path to the add icon SVG
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // Prevents event bubbling
-                                        handleAddNodeModal(nodeDatum)
-                                    }}
-                                    x={-28} // Example value: 20 units from the left
-                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3} // Example value: 20 units from the top
-                                    width={25} // Example value: 40 units width
-                                    height={25} // Example value: 40 units height
-                                // Set other attributes for the add icon as needed
-                                />
-                            </>
-                        )}
+                            }
+
+
+                            {/* Menu items */}
+                            <g
+                                style={{ display: dropdownStates[nodeDatum.name] ? 'block' : 'none', zIndex: 1000 }}
+                            >
+                                <g className='menu'>
+                                    <a href="#">
+                                        <text x="-40" y="40" fill="#ffffff" font-size="40px">1</text>
+                                    </a>
+                                </g>
+                                <g className='menu'>
+                                    <a href="#">
+                                        <text x="-25" y="65" fill="#ffffff" font-size="40px">2</text>
+                                    </a>
+                                </g>
+                                <g className='menu'>
+                                    <a href="#">
+                                        <text x="25" y="65" fill="#ffffff" font-size="40px">3</text>
+                                    </a>
+                                </g>
+                                <g className='menu'>
+                                    <a href="#">
+                                        <text x="40" y="40" fill="#ffffff" font-size="40px">4</text>
+                                    </a>
+                                </g>
+                                <g className='menu'>
+                                    <a href="#">
+                                        <text x="25" y="15" fill="#ffffff" font-size="40px">5</text>
+                                    </a>
+                                </g>
+                                <g className='menu'>
+                                    <a href="#">
+                                        <text x="-25" y="15" fill="#ffffff" font-size="40px">6</text>
+                                    </a>
+                                </g>
+
+
+
+                            </g>
+                        </g>
+
+
+
 
                         {
                             !nodeDatum?.children || nodeDatum?.children?.length <= 0 ? "" : nodeDatum?.children?.length > 0 && nodeDatum?.__rd3t?.collapsed ? <image
@@ -299,6 +369,7 @@ const D3FlowGraph = ({ treeData, setTreeData, alwayShowNeighborNode = false, han
             </g>
 
         );
+
     };
 
 
@@ -323,22 +394,8 @@ const D3FlowGraph = ({ treeData, setTreeData, alwayShowNeighborNode = false, han
                 separation={{ siblings: 2, nonSiblings: 2 }}
                 pathFunc="diagonal"
                 initialDepth={0}
-                shouldCollapseNeighborNodes={alwayShowNeighborNode}
+                shouldCollapseNeighborNodes={alwaysShowNeighborNode}
             />
-
-            <div>
-                {/* Edit Modal */}
-                <input type="checkbox" id="edit_modal" className="modal-toggle" />
-                <div className="modal" role="dialog">
-                    <div className="modal-box">
-                        <h3 className="font-bold text-lg">{currentNode?.name}</h3>
-                        <p className="py-4">This modal works with a hidden checkbox!</p>
-                        <div className="modal-action">
-                            <label htmlFor="edit_modal" className="btn">Close!</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
