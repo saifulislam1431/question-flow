@@ -5,6 +5,7 @@ import Tree from 'react-d3-tree';
 import { useDraggable } from 'react-use-draggable-scroll';
 
 const D3FlowGraph = ({ treeData, setTreeData, alwaysShowNeighborNode = false, handleEditNodeModal, handleAddNodeModal, copyNodeData, pasteNodeData }) => {
+    const [hoveredOption, setHoveredOption] = useState(null);
     const [dropdownStates, setDropdownStates] = useState({});
     const [optionValue, setOptionValue] = useState("");
     const [currentNode, setCurrentNode] = useState(null);
@@ -238,119 +239,208 @@ const D3FlowGraph = ({ treeData, setTreeData, alwaysShowNeighborNode = false, ha
                         </text>
 
 
-
-                        {/* <image
-                            xlinkHref="./assets/icon/dots.png" // Provide the path to the edit icon SVG
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevents event bubbling
-                                toggleDropdown(nodeDatum?.name);
-                            }}
-                            x={-10} // Example value: 20 units from the left
-                            y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
-                            width={25}
-                            height={25}
-                        />
-                        <g
-                            transform={`translate(0, ${lines.length === 1 ? 60 : rectHeight / 1.4 + 25})`} // Adjust the position based on your layout
-                            style={{ display: dropdownStates[nodeDatum.name] ? 'block' : 'none', position: 'absolute', zIndex: 1000 }} // Show/hide dropdown based on state of the clicked node
-                        >
-
-
-                            <rect
-                                x="40"
-                                y="-50"
-                                width={140}
-                                height={140}
-                                filter={"url(#f1)"}
-                                fill='#ffffff'
-                                rx="10"
-                                ry="10"
-                            />
-
-
-                            <text x="50" y="-20" style={{ cursor: 'pointer' }}>Option 1</text>
-                            <text x="50" y="0" style={{ cursor: 'pointer' }}>Option 2</text>
-                            <text x="50" y="20" style={{ cursor: 'pointer' }}>Option 3</text>
-                        </g> */}
-
-                        <g onClick={(e) => {
-                            e.stopPropagation(); // Prevents event bubbling
-                            toggleDropdown(nodeDatum?.name);
-                        }}>
-                            {/* Menu toggler */}
-                            {
-                                !dropdownStates[nodeDatum.name] ? <image
-                                    xlinkHref="./assets/icon/dots.png" // Provide the path to the edit icon SVG
-                                    x={-10} // Example value: 20 units from the left
-                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
-                                    width={25}
-                                    height={25}
-                                /> : <image
-                                    xlinkHref="./assets/icon/cross.png" // Provide the path to the edit icon SVG
-                                    x={-10} // Example value: 20 units from the left
-                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
-                                    width={25}
-                                    height={25}
-                                />
-                            }
-
-                            {/* Menu items */}
-                            <g
-                                style={{ display: dropdownStates[nodeDatum.name] ? 'block' : 'none', zIndex: 1000 }}
-                            >
-
-                                <rect
-                                    width={140}
-                                    height={140}
-                                    filter={"url(#f1)"}
-                                    fill='#ffffff'
-                                    rx="10"
-                                    ry="10"
-                                    x="25"
-                                    y="10"
-                                />
-
-                                {
-                                    nodeDatum?.name?.includes("?") || nodeDatum?.children?.length > 0 ? <image
-                                        xlinkHref="./assets/icon/edit.png"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditNodeModal(nodeDatum);
-                                        }}
-                                        width={25}
-                                        height={25}
-                                        x="35"
-                                        y="20"
-                                    /> : nodeDatum?.children?.length <= 0 | !nodeDatum?.children && <>
+                        {nodeDatum?.name?.includes("?") || nodeDatum?.children?.length > 0 ? (
+                            <>
+                                <g onClick={(e) => {
+                                    e.stopPropagation(); // Prevents event bubbling
+                                    toggleDropdown(nodeDatum?.name);
+                                }}>
+                                    {/* Menu toggler */}
+                                    {!dropdownStates[nodeDatum.name] ? (
                                         <image
-                                            xlinkHref="./assets/icon/edit.png"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleEditNodeModal(nodeDatum)
-                                            }}
+                                            xlinkHref="./assets/icon/dots.png"
+                                            x={-10}
+                                            y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
                                             width={25}
                                             height={25}
-                                            x="35"
-                                            y="20"
                                         />
-
+                                    ) : (
                                         <image
-                                            xlinkHref="./assets/icon/plus.png"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleAddNodeModal(nodeDatum)
-                                            }}
+                                            xlinkHref="./assets/icon/cross.png"
+                                            x={-10}
+                                            y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
                                             width={25}
                                             height={25}
-                                            x="65"
-                                            y="20"
-
                                         />
-                                    </>
-                                }
-                            </g>
-                        </g>
+                                    )}
 
+                                    {/* Menu items using foreignObject */}
+                                    {dropdownStates[nodeDatum.name] && (
+                                        <foreignObject x="35" y="-10" width="160" height="160" style={{
+                                            overflow: 'auto',
+                                            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
+                                        }}>
+                                            <div xmlns="http://www.w3.org/1999/xhtml" style={{
+                                                width: '140px', height: '160px', backgroundColor: '#374151', borderRadius: '10px', paddingTop: '10px', paddingBottom: '10px', paddingLeft: '10px', overflow: "auto",
+
+                                            }}>
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Edit' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Edit')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Edit");
+                                                    }}
+                                                >
+                                                    Edit
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Copy' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Copy')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Copy");
+                                                    }}
+                                                >
+                                                    Copy
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Cut' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Cut')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Cut");
+                                                    }}
+                                                >
+                                                    Cut
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Paste' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Paste')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Paste");
+                                                    }}
+                                                >
+                                                    Paste
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Move' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Move')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Move");
+                                                    }}
+                                                >
+                                                    Move
+                                                </div>
+                                            </div>
+                                        </foreignObject>
+                                    )}
+                                </g>
+                            </>
+
+                        ) : nodeDatum?.children?.length <= 0 | !nodeDatum?.children && (
+                            <>
+                                <g onClick={(e) => {
+                                    e.stopPropagation(); // Prevents event bubbling
+                                    toggleDropdown(nodeDatum?.name);
+                                }}>
+                                    {/* Menu toggler */}
+                                    {!dropdownStates[nodeDatum.name] ? (
+                                        <image
+                                            xlinkHref="./assets/icon/dots.png"
+                                            x={8}
+                                            y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
+                                            width={25}
+                                            height={25}
+                                        />
+                                    ) : (
+                                        <image
+                                            xlinkHref="./assets/icon/cross.png"
+                                            x={8}
+                                            y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3}
+                                            width={25}
+                                            height={25}
+                                        />
+                                    )}
+
+                                    {/* Menu items using foreignObject */}
+                                    {dropdownStates[nodeDatum.name] && (
+                                        <foreignObject x="35" y="-10" width="160" height="160" style={{
+                                            overflow: 'auto',
+                                            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"
+                                        }}>
+                                            <div xmlns="http://www.w3.org/1999/xhtml" style={{
+                                                width: '140px', height: '160px', backgroundColor: '#374151', borderRadius: '10px', padding: '10px', overflow: "auto",
+
+                                            }}>
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Edit' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Edit')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Edit");
+                                                    }}
+                                                >
+                                                    Edit
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Copy' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Copy')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Copy");
+                                                    }}
+                                                >
+                                                    Copy
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Cut' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Cut')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Cut");
+                                                    }}
+                                                >
+                                                    Cut
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Paste' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Paste')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Paste");
+                                                    }}
+                                                >
+                                                    Paste
+                                                </div>
+
+                                                <div style={{ color: '#fff', cursor: 'pointer', marginBottom: '10px', padding: '5px', borderRadius: '5px', backgroundColor: hoveredOption === 'Move' ? '#545F6D' : '#374151' }}
+                                                    onMouseOver={() => setHoveredOption('Move')}
+                                                    onMouseOut={() => setHoveredOption(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log("Move");
+                                                    }}
+                                                >
+                                                    Move
+                                                </div>
+                                            </div>
+                                        </foreignObject>
+                                    )}
+                                </g>
+                                <image
+                                    xlinkHref="./assets/icon/plus.png" // Provide the path to the add icon SVG
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevents event bubbling
+                                        handleAddNodeModal(nodeDatum)
+                                    }}
+                                    x={-28} // Example value: 20 units from the left
+                                    y={lines?.length === 1 ? rectHeight / 5 : lines?.length === 2 ? rectHeight / 4 : lines?.length === 3 ? rectHeight / 3 : rectHeight / 2.3} // Example value: 20 units from the top
+                                    width={25} // Example value: 40 units width
+                                    height={25} // Example value: 40 units height
+                                // Set other attributes for the add icon as needed
+                                />
+                            </>
+                        )}
 
 
 
@@ -379,6 +469,8 @@ const D3FlowGraph = ({ treeData, setTreeData, alwaysShowNeighborNode = false, ha
                             // Set other attributes for the edit icon as needed
                             />
                         }
+
+
                     </g>
                 ))}
             </g>
